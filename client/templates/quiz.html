@@ -1,0 +1,35 @@
+<template name="quiz">
+  <h4 align="center"> You must answer all following questions correctly in order to be eligible for participation</h4>
+  <p align="center"><i>You have two opportunities to submit your responses</i></p>
+
+  <form class="quiz">
+    {{#each questions}}
+    {{> question}}
+    {{/each}}
+    {{#if passedQuiz}}
+    <div class="alert alert-success" align="center">You have successfully passed the quiz! Click Finish below to get
+      matched with other players and start a game.</div>
+    {{else}} {{#if Cond quizAttempts '==' 1}}
+    <div class="alert alert-warning" align="center">One or more of your answers are incorrect. You have one more attempt
+      remaining.</div>
+    {{else}} {{#if Cond quizAttempts '==' 2}}
+    <div class="alert alert-danger" align="center">One or more of your answers are still incorrect. You have exhausted
+      your quiz attempts. Click Finish Below.</div>
+    {{/if}}
+    {{/if}}
+    {{/if}}
+    {{#if Cond quizAttempts '!=' 2}}
+    {{#unless passedQuiz}}
+    <button type="submit" class="btn btn-primary btn-sm submit" aria-label="Left Align"
+      style="margin-left:auto; margin-right:auto; display:block" id="submitQuiz">Submit Answers</button>
+    {{/unless}}
+    {{/if}}
+  </form>
+</template>
+
+<template name="question">
+  <div class="form-group {{#if incorrect}}has-error{{/if}}">
+    <label for="{{_id}}" class="control-label">{{text}}</label>
+    <input id="{{_id}}" name="{{_id}}" class="sm-width form-control">
+  </div>
+</template>

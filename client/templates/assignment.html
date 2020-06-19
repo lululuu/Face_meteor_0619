@@ -1,0 +1,37 @@
+<template name="assignment">
+  <div class="container-fluid" id="main">
+    {{> tutorial options}}
+  </div>
+</template>
+
+<template name="matched">
+  <h3 align="center">You have been successfully matched with a group of farmers!</h3>
+  {{#if gameInfo.isAllocator}}
+  <h4 align="center"><u>You have been assigned the role of the head farmer</u></h4>
+  <p align="center" style="font-size:16px"> Remember you will be deciding how to re-distribute the rice at the public
+    co-op to each farmer.</p>
+  {{/if}}
+
+  <blockquote class="instr">
+    As a quick reminder, you will play with {{otherPlayers}} other farmers consisting of {{numRounds}} seasons. Each
+    season will comprise 7 parts:<br><br>
+    <ol>
+      <li>Each farmer will receive 100 bags of rice and decide how many of their bags to contribute to the public co-op
+      </li>
+      <li>Each farmer will see the contributions made by other farmers</li>
+      <li>The head farmer will decide how to re-distribute the rice at the public co-op to each player</li>
+      <li>Each farmer will see the total earnings of rice (the amount of what you keep plus the amount from the head
+        farmer) </li>
+      <li>Each farmer will then decide how to privately trade a maximum of 10 bushels of wheat with each farmer</li>
+      <li>After every farmer propose, you will see the wheat offers proposed by the other farmers. You can decide either
+        accept or reject the offers from each farmer</li>
+      <li>Each player will see the total earnings of wheat for that season, and this will be the end of this season.
+        There will be 10 seasons in total</li>
+    </ol>
+  </blockquote>
+  <br>
+  <p align="center" style="font-size:16px"> This is the avatar that will represent you through the game: <img
+      class="avatar" src="{{gameInfo.icon}}"></p>
+  <p align="center" style="font-size:16px"> Click Finish below if you aready to begin. The game will start when every
+    player is ready.</p>
+</template>

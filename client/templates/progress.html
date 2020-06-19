@@ -1,0 +1,22 @@
+<!-- TODO: Update to reflect new game states -->
+<template name="progress">
+  {{#if game}}
+  <div>
+    <ul class="nav nav-wizard">
+      <li id="roundCounter"><u>Current Season:</u> {{game.round}}</li>
+      <li class="{{game.pChoose}}"><a>Your Contribution of Rice</a></li>
+      <li class='{{game.pDisp}}'><a>Others' Contribution of Rice</a></li>
+
+      <li class='{{game.aChoose}}'><a>Head Farmer Deciding</a></li>
+      <li class='{{game.aDisp}}'><a>Everyone's Rice Earnings</a></li>
+      <li class='{{game.UGDecider}}'><a>Your Proposals of Wheat</a></li>
+      <li class='{{game.UGReceiver}}'><a>Others Offers of Wheat</a></li>
+      <li class='{{game.UGOutcome}}'><a>Everyone's Wheat Earnings</a></li>
+      {{#if game.displayEnd}}
+      <li class='{{game.gameEnd}}'><a>Game End</a></li>
+      {{/if}}
+
+    </ul>
+  </div>
+  {{/if}}
+</template>

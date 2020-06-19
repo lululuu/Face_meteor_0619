@@ -1,0 +1,999 @@
+<template name="game">
+
+  <div class="container-fluid">
+    <div class="row">
+      {{#unless Cond game.state '==' 'playerRatings'}}
+      <div class="col-xs-8 col-xs-offset-2">
+        <div class="well well-sm well-text" align="center">
+          <b>{{game.messagePrompt}}</b>
+          {{#if Cond game.state '==' 'UGDecider'}}
+          <a data-toggle="modal" href="#calcBonusModal">
+            <span class="glyphicon glyphicon-question-sign"></span>
+          </a>
+          {{/if}}
+        </div>
+      </div>
+      {{/unless}}
+
+      {{#if Cond game.state '==' 'pChoose'}}
+      {{> playerContribution}}
+      {{else}} {{#if Cond game.state '==' 'pDisp'}}
+      {{> playerDisplay}}
+      {{else}} {{#if Cond game.state '==' 'aChoose'}}
+      {{> allocatorChoose}}
+      {{else}} {{#if Cond game.state '==' 'aDisp'}}
+      {{> allocatorDisplay}}
+      {{else}} {{#if Cond game.state '==' 'UGDecider'}}
+      {{> UGDecider}}
+      {{else}} {{#if Cond game.state '==' 'UGSelfOutcome'}}
+      {{> UGSelfOutcome}}
+      {{else}} {{#if Cond game.state '==' 'UGOutcome'}}
+      {{> UGOutcome}}
+      {{else}} {{#if Cond game.state '==' 'roundOutcome'}}
+      {{> roundOutcome}}
+      {{else}} {{#if Cond game.state '==' 'playerRatings'}}
+      {{> playerRatings}}
+      {{else}} {{#if Cond game.state '==' 'finalOut'}}
+      {{> finalOutcomes}}
+      {{/if}}
+      {{/if}}
+      {{/if}}
+      {{/if}}
+      {{/if}}
+      {{/if}}
+      {{/if}}
+      {{/if}}
+      {{/if}}
+      {{/if}}
+    </div>
+  </div>
+
+</template>
+
+<!-- template for player contribution -->
+<template name="playerContribution">
+  <div class="row" id="contributionSliderRow">
+    <div class="col-xs-1 col-xs-offset-3">
+      <p class="contributionText">0<br>bags</p>
+    </div>
+    <div class="col-xs-4">
+      <form oninput="rangeOutput.value = rangeInput.value">
+        <input type="range" id="contributionSlider" value="{{limit}}" min="0" max="100" name="rangeInput">
+        <br>
+        <output class="contributionText" name="rangeOutput" for="rangeInput"><span
+            class="contributionText">{{limit}}</span></output>
+      </form>
+    </div>
+    <div class="col-xs-1">
+      <p class="contributionText">100<br>bags</p>
+    </div>
+    <div class="col-xs-4 col-xs-offset-4">
+      <button type="button" class="btn btn-primary btn-lg" id="contributionSubmit" aria-label="Left Align"
+        style="margin-left:auto; margin-right:auto; display:block">Submit</button>
+    </div>
+    {{#unless allocation.isFirstRound}}
+    <div class="col-xs-4 col-xs-offset-4">
+      <button type="button" class="btn btn-warning btn-sm" id="showLastRound" aria-label="Left Align"
+        style="margin-left:auto; margin-right:auto; display:block" data-toggle="modal"
+        data-target="#lastRoundModal">Result of Last Round</button>
+    </div>
+    {{/unless}}
+  </div>
+
+  <div class="modal fade" id="lastRoundModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title">Result of Last Round</h3>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <table class="table text-center">
+              <tr>
+                <td></td>
+                {{#each allocation.players}}
+                <td><img class="rowAvatar" src="{{icon}}"></td>
+                {{/each}}
+              </tr>
+              <tr id="totalRow">
+                <td><span class='rowHeader' style="color:black;">Received:</span></td>
+                {{#each allocation.self.lastRoundReceived}}
+                <td class="tableRow">{{this}}</td>
+                {{/each}}
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- template for other player contributions -->
+<template name="playerDisplay">
+  <div class="col-xs-12">
+    <ul class="neighborContributions" align="center">
+      {{#each contributions}}
+      <li class="neighborContributionsText"> <img class="avatar" src="{{icon}}"> {{amount}} bags of rice</li>
+      {{/each}}
+    </ul>
+  </div>
+</template>
+
+<!-- template for allocator to make choices -->
+<template name="allocatorChoose">
+  {{#if allocation.isAllocator}}
+
+  <div class="row">
+    <div class="col-xs-4 col-xs-offset-4" id="allocatorWarning" style="visibility:hidden">
+      <p align="center" style="color:red; font-size:21px">You must allocate all the bags in the co-op!</p>
+    </div>
+  </div>
+  <div class="col-xs-8 col-xs-offset-2">
+    <h4 align="center" id="allocationAmount"> Total bags allocated: <span id="total">0</span>/{{allocation.pot}}</h4>
+
+  </div>
+  {{#each allocation.players}}
+  <div class="row" id="allocatorSliderRow">
+    <div class="col-xs-1 col-xs-offset-2" id="{{#if isplayer}}allocDiv{{/if}}">
+      <label id="allocAvatar" for="{{name}}"><img class="avatar" src="{{icon}}">{{#if isplayer}}<span
+          id="allocLabel">(You)</span>{{/if}}</label>
+    </div>
+    <div class="col-xs-1">
+      <p class="contributionText">0<br>bags</p>
+    </div>
+    <div class="col-xs-4">
+      <form class="allocation-slider" oninput="rangeOutput.value = rangeInput.value">
+        <input type="range" id="{{name}}" value="0" min="0" max="{{allocation.pot}}" name="rangeInput">
+
+        <br>
+        <output class="contributionText output-text" name="rangeOutput" for="rangeInput"><span
+            class="contributionText">0</span></output>
+      </form>
+    </div>
+    <div class="col-xs-1">
+      <p class="contributionText">{{allocation.pot}}<br>bags</p>
+    </div>
+  </div>
+  {{/each}}
+  <div class="row">
+    <div class="col-xs-4 col-xs-offset-4">
+      <button type="button" class="btn btn-primary btn-lg" id="contributionSubmit" aria-label="Left Align"
+        style="margin-left:auto; margin-right:auto; display:block">Submit</button>
+    </div>
+  </div>
+  {{#unless allocation.isFirstRound}}
+  <div class="row">
+    <div class="col-xs-4 col-xs-offset-4 mt-5">
+      <button type="button" class="btn btn-warning btn-sm" id="showLastRound" aria-label="Left Align"
+        data-toggle="modal" data-target="#lastRoundModal"
+        style="margin-left:auto; margin-right:auto; display:block">Result of Last Round</button>
+    </div>
+  </div>
+  {{/unless}}
+
+  <div class="modal fade" id="lastRoundModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h6 class="modal-title">Result of Last Round</h6>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <table class="table text-center">
+              <tr>
+                <td></td>
+                {{#each allocation.players}}
+                <td><img class="rowAvatar" src="{{icon}}"></td>
+                {{/each}}
+              </tr>
+              <tr id="totalRow">
+                <td><span class='rowHeader' style="color:black;">Received:</span></td>
+                {{#each allocation.lastRoundReceived}}
+                <td class="tableRow">{{this}}</td>
+                {{/each}}
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {{else}}
+  <div class="col-xs-4 col-xs-offset-4">
+    <p align="center" style="font-size:16px"> <img class="thinking" src="/avatars/thinking.png"></p>
+    <p align="center" style="font-size:16px"> <img class="avatar" src="{{allocation.allocatorIcon}}"></p>
+  </div>
+  {{/if}}
+</template>
+
+<!--template for displaying allocator's choices -->
+<template name="allocatorDisplay">
+  <div class="col-xs-12" style="{{game.messageSubPromptDisplay}}">
+    <p id="messagePrompt"><b>{{game.messageSubPrompt}}</b></p>
+  </div>
+  <div class="col-xs-12">
+    <ul class="neighborContributions" align="center">
+      {{#each allocations}}
+      <li class="neighborContributionsText">
+        <img class="avatar" src="{{icon}}"><span id="{{#if isplayer}}playerLabel{{/if}}"> {{amount}} bags of
+          rice</span></li>
+      {{/each}}
+    </ul>
+  </div>
+</template>
+
+<!--template for UG Decider allocation -->
+<template name="UGDecider">
+  <div class="row">
+    <div class="col-xs-4 col-xs-offset-4" id="allocatorWarning" style="visibility:hidden">
+      <p align="center" style="color:red; font-size:21px">You must allocate all your bags!</p>
+    </div>
+  </div>
+  <div class="col-xs-8 col-xs-offset-2">
+    <h4 align="center" id="allocationAmount"> Total bags allocated: <span id="total">0</span>/{{data.ugPot}}</h4>
+  </div>
+  <div class="row" id="allocatorSliderRow">
+    <div class="col-xs-1 col-xs-offset-2" id="allocDiv">
+      <label id="allocAvatar" for="{{data.self.id}}"><img class="avatar" src="{{data.self.icon}}"><span
+          id="allocLabel">(You)</span></label>
+    </div>
+    <div class="col-xs-1">
+      <p class="contributionText">0<br>bags</p>
+    </div>
+    <div class="col-xs-4">
+      <form class="allocation-slider" oninput="rangeOutput.value = rangeInput.value">
+        <input type="range" id="{{data.self.id}}" value="0" min="0" max="{{data.ugPot}}" name="rangeInput">
+        <br>
+        <output class="contributionText output-text" name="rangeOutput" for="rangeInput"><span
+            class="contributionText">0</span></output>
+      </form>
+    </div>
+    <div class="col-xs-1">
+      <p class="contributionText">{{data.ugPot}}<br>bags</p>
+    </div>
+  </div>
+  {{#each data.players}}
+  <div class="row" id="allocatorSliderRow">
+    <div class="col-xs-1 col-xs-offset-2">
+      <label id="allocAvatar" for="{{id}}"><img class="avatar" src="{{icon}}"></label>
+    </div>
+    <div class="col-xs-1">
+      <p class="contributionText">0<br>bags</p>
+    </div>
+    <div class="col-xs-4">
+      <form class="allocation-slider" oninput="rangeOutput.value = rangeInput.value">
+        <input type="range" id="{{id}}" value="0" min="0" max="{{data.ugPot}}" name="rangeInput">
+        <br>
+        <output class="contributionText output-text" name="rangeOutput" for="rangeInput"><span
+            class="contributionText">0</span></output>
+      </form>
+    </div>
+    <div class="col-xs-1">
+      <p class="contributionText">{{data.ugPot}}<br>bags</p>
+    </div>
+  </div>
+  {{/each}}
+  <div class="row">
+    <div class="col-xs-4 col-xs-offset-4">
+      <button type="button" class="btn btn-primary btn-lg" id="contributionSubmit" aria-label="Left Align"
+        style="margin-left:auto; margin-right:auto; display:block">Submit</button>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-4 col-xs-offset-4">
+      <button type="button" class="btn btn-warning btn-sm" id="showPggResult" aria-label="Left Align"
+        data-toggle="modal" data-target="#pggResultModal"
+        style="margin-left:auto; margin-right:auto; display:block">Result of Last season</button>
+    </div>
+  </div>
+
+  <div class="modal fade" id="pggResultModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">Result of past rounds</h4>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <table class="table text-center">
+              <tr>
+                <td></td>
+                {{#each data.allPlayers}}
+                <td><img class="rowAvatar" src="{{icon}}"></td>
+                {{/each}}
+              </tr>
+              <tr>
+                <td class="modalRow"><span class='rowHeader'>Contributions:</span></td>
+                {{#each data.allPlayers}}
+                <td class="modalRow">{{pggContributions}}</td>
+                {{/each}}
+              </tr>
+              <tr>
+                <td class="modalRow"><span class='rowHeader'>Received:</span></td>
+                {{#each data.allPlayers}}
+                <td class="modalRow">{{pggResult}}</td>
+                {{/each}}
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="calcBonusModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">How is the bonus calculated?</h4>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <p style='font-size: 16px'>The four examples below show how the bonus is calculated.
+              <br>
+              We can see in each example, you all received 10 elements; however, after the bonus calculation, you would
+              get different points.
+            </p>
+            <blockquote class="instr">
+              <div class="row">
+                <div class="col-xs-8 col-xs-offset-1">
+                  <table class="table text-center">
+                    <tr id="iconRow">
+                      <td></td>
+                      <td><img class="instrucAvatar" src="/avatars/cat_food.png"></td>
+                      <td><img class="instrucAvatar" src="/avatars/lion_food.png"></td>
+                      <td><img class="instrucAvatar" src="/avatars/elephant_food.png"></td>
+                      <td><img class="instrucAvatar" src="/avatars/cow_food.png"></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr id="totalRow">
+                      <td><span class='rowHeader' style="color:black;">Received:</span></td>
+                      <td class="tableRow">10</td>
+                      <td class="tableRow">0</td>
+                      <td class="tableRow">0</td>
+                      <td class="tableRow">0</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow">Bonus:</td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">x4</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">0</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">x3</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">0</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">x2</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">0</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">10</td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">x1</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">10</td>
+                    </tr>
+                  </table>
+
+                </div>
+                <div class="col-xs-2 col-xs-offset-1 text-center">
+                  <div class="row">
+                    <img style="margin-top:2rem" src="{{data.self.icon}}">
+                    <p>(You)</p>
+                    <p class='bonusOutcome'>+10</p>
+                  </div>
+                </div>
+              </div>
+            </blockquote>
+            <blockquote class="instr">
+              <div class="row">
+                <div class="col-xs-8 col-xs-offset-1">
+                  <table class="table text-center">
+                    <tr id="iconRow">
+                      <td></td>
+                      <td><img class=" instrucAvatar" src="/avatars/cat_food.png"></td>
+                      <td><img class=" instrucAvatar" src="/avatars/lion_food.png"></td>
+                      <td><img class=" instrucAvatar" src="/avatars/elephant_food.png"></td>
+                      <td><img class=" instrucAvatar" src="/avatars/cow_food.png"></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr id="totalRow">
+                      <td><span class='rowHeader' style="color:black;">Received:</span></td>
+                      <td class="tableRow">0</td>
+                      <td class="tableRow">5</td>
+                      <td class="tableRow">5</td>
+                      <td class="tableRow">0</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow">Bonus:</td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">x4</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">0</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">x3</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">0</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">5</td>
+                      <td id="bonusRow">5</td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">x2</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">20</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">x1</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">0</td>
+                    </tr>
+                  </table>
+
+                </div>
+                <div class="col-xs-2 col-xs-offset-1 text-center">
+                  <div class="row">
+                    <img style="margin-top:2rem" src="{{data.self.icon}}">
+                    <p>(You)</p>
+                    <p class='bonusOutcome'>+20</p>
+                  </div>
+                </div>
+              </div>
+            </blockquote>
+            <blockquote class="instr">
+              <div class="row">
+                <div class="col-xs-8 col-xs-offset-1">
+                  <table class="table text-center">
+                    <tr id="iconRow">
+                      <td></td>
+                      <td><img class=" instrucAvatar" src="/avatars/cat_food.png"></td>
+                      <td><img class=" instrucAvatar" src="/avatars/lion_food.png"></td>
+                      <td><img class=" instrucAvatar" src="/avatars/elephant_food.png"></td>
+                      <td><img class=" instrucAvatar" src="/avatars/cow_food.png"></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr id="totalRow">
+                      <td><span class='rowHeader' style="color:black;">Received:</span></td>
+                      <td class="tableRow">3</td>
+                      <td class="tableRow">4</td>
+                      <td class="tableRow">3</td>
+                      <td class="tableRow">0</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow">Bonus:</td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">x4</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">0</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">3</td>
+                      <td id="bonusRow">3</td>
+                      <td id="bonusRow">3</td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">x3</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">27</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">x2</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">0</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">1</td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">x1</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">1</td>
+                    </tr>
+                  </table>
+
+                </div>
+                <div class="col-xs-2 col-xs-offset-1 text-center">
+                  <div class="row">
+                    <img style="margin-top:2rem" src="{{data.self.icon}}">
+                    <p>(You)</p>
+                    <p class='bonusOutcome'>+28</p>
+                  </div>
+                </div>
+              </div>
+            </blockquote>
+            <blockquote class="instr">
+              <div class="row">
+                <div class="col-xs-8 col-xs-offset-1">
+                  <table class="table text-center">
+                    <tr id="iconRow">
+                      <td></td>
+                      <td><img class=" instrucAvatar" src="/avatars/cat_food.png"></td>
+                      <td><img class=" instrucAvatar" src="/avatars/lion_food.png"></td>
+                      <td><img class=" instrucAvatar" src="/avatars/elephant_food.png"></td>
+                      <td><img class=" instrucAvatar" src="/avatars/cow_food.png"></td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr id="totalRow">
+                      <td><span class='rowHeader' style="color:black;">Received:</span></td>
+                      <td class="tableRow">2</td>
+                      <td class="tableRow">3</td>
+                      <td class="tableRow">2</td>
+                      <td class="tableRow">3</td>
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow">Bonus:</td>
+                      <td id="bonusRow">2</td>
+                      <td id="bonusRow">2</td>
+                      <td id="bonusRow">2</td>
+                      <td id="bonusRow">2</td>
+                      <td id="bonusRow">x4</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">32</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">x3</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">0</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">1</td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">1</td>
+                      <td id="bonusRow">x2</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">4</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow"></td>
+                      <td id="bonusRow">x1</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">0</td>
+                    </tr>
+                  </table>
+
+                </div>
+                <div class="col-xs-2 col-xs-offset-1 text-center">
+                  <div class="row">
+                    <img style="margin-top:2rem" src="{{data.self.icon}}">
+                    <p>(You)</p>
+                    <p class='bonusOutcome'>+36</p>
+                  </div>
+                </div>
+              </div>
+            </blockquote>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- TODO: after click the "BONUS" button, it will show bonus -->
+<template name="UGSelfOutcome">
+  <div class="row UGSelfOutcome-row-div">
+    <div class="col-xs-3"></div>
+    <div class="col-xs-7">
+      <div class="row">
+        <div class="col-xs-10">
+          <table class="table text-center">
+            <tr>
+              <td></td>
+              {{#each data.players}}
+              <td><img class="rowAvatar" src="{{icon}}"></td>
+              {{/each}}
+              <td style="width: 2rem;"></td>
+              <td style="width: 2rem;"></td>
+              <td style="width: 2rem;"></td>
+            </tr>
+            <tr id="totalRow">
+              <td><span class='rowHeader' style="color:black;">Received:</span></td>
+              {{#each data.self.received}}
+              <td class="tableRow">{{this}}</td>
+              {{/each}}
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+
+            <tr class='BonusRow' id="BonusRow1" style="visibility: hidden">
+              <td id="bonusRow">Bonus:</td>
+              {{#each data.self.bonus.bonus4}}
+              <td id="bonusRow">{{this}}</td>
+              {{/each}}
+              <td id="bonusRow">x4</td>
+              <td id="bonusRow">=</td>
+              <td id="bonusRow">{{data.self.resultmulti4}}</td>
+            </tr>
+            <tr class='BonusRow' id="BonusRow2" style="visibility: hidden">
+              <td id="bonusRow"></td>
+              {{#each data.self.bonus.bonus3}}
+              <td id="bonusRow">{{this}}</td>
+              {{/each}}
+              <td id="bonusRow">x3</td>
+              <td id="bonusRow">=</td>
+              <td id="bonusRow">{{data.self.resultmulti3}}</td>
+            </tr>
+            <tr class='BonusRow' id="BonusRow3" style="visibility: hidden">
+              <td id="bonusRow"></td>
+              {{#each data.self.bonus.bonus2}}
+              <td id="bonusRow">{{this}}</td>
+              {{/each}}
+              <td id="bonusRow">x2</td>
+              <td id="bonusRow">=</td>
+              <td id="bonusRow">{{data.self.resultmulti2}}</td>
+            </tr>
+            <tr class='BonusRow' id="BonusRow4" style="visibility: hidden">
+              <td id="bonusRow"></td>
+              {{#each data.self.bonus.bonus1}}
+              <td id="bonusRow">{{this}}</td>
+              {{/each}}
+              <td id="bonusRow">x1</td>
+              <td id="bonusRow">=</td>
+              <td id="bonusRow">{{data.self.resultmulti1}}</td>
+            </tr>
+          </table>
+        </div>
+        <div class="col-xs-2 text-center">
+          <div class="row">
+            <img class="outcomeAvatar" src="{{data.self.icon}}">
+            <p style="color: white;">(You)</p>
+            <p class='bonusOutcome' id="selfBonus">+<span id="total">{{data.self.total}}</span>
+              <a id="dispModal" data-toggle="modal" href="#calcBonusModal">
+                <span class="glyphicon glyphicon-question-sign"></span>
+              </a>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-2"></div>
+  </div>
+
+  <div class="row">
+    <div class="col-xs-4 col-xs-offset-4">
+      <button type="button" class="btn btn-primary" id="showBonus" aria-label="Left Align"
+        style="margin-left:auto; margin-right:auto; display:block">Next</button>
+    </div>
+  </div>
+  <div class="modal fade" id="calcBonusModal" role="dialog">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h4 class="modal-title">How is your bonus calculated?</h4>
+        </div>
+        <div class="modal-body">
+          <div class="container-fluid">
+            <p style='font-size: 16px'>The table below shows how your bonus is calculated.
+            </p>
+            <blockquote class="instr">
+              <div class="row">
+                <div class="col-xs-8 col-xs-offset-1">
+                  <table class="table text-center">
+                    <tr id="iconRow">
+                      <td></td>
+                      {{#each data.players}}
+                      <td><img class="instrucAvatar" src="{{icon}}"></td>
+                      {{/each}}
+
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr id="totalRow">
+                      <td><span class='rowHeader' style="color:black;">Received:</span></td>
+                      {{#each data.self.received}}
+                      <td class="tableRow">{{this}}</td>
+                      {{/each}}
+                      <td></td>
+                      <td></td>
+                      <td></td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow">Bonus:</td>
+                      {{#each data.self.bonus.bonus4}}
+                      <td id="bonusRow">{{this}}</td>
+                      {{/each}}
+                      <td id="bonusRow">x4</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">{{data.self.resultmulti4}}</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      {{#each data.self.bonus.bonus3}}
+                      <td id="bonusRow">{{this}}</td>
+                      {{/each}}
+                      <td id="bonusRow">x3</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">{{data.self.resultmulti3}}</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      {{#each data.self.bonus.bonus2}}
+                      <td id="bonusRow">{{this}}</td>
+                      {{/each}}
+                      <td id="bonusRow">x2</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">{{data.self.resultmulti2}}</td>
+                    </tr>
+                    <tr class='BonusRow'>
+                      <td id="bonusRow"></td>
+                      {{#each data.self.bonus.bonus1}}
+                      <td id="bonusRow">{{this}}</td>
+                      {{/each}}
+                      <td id="bonusRow">x1</td>
+                      <td id="bonusRow">=</td>
+                      <td id="bonusRow">{{data.self.resultmulti1}}</td>
+                    </tr>
+                  </table>
+
+                </div>
+                <div class="col-xs-2 col-xs-offset-1 text-center">
+                  <div class="row">
+                    <img style="margin-top:2rem" src="{{data.self.icon}}">
+                    <p>(You)</p>
+                    <p class='bonusOutcome'>{{data.self.total}}</p>
+                  </div>
+                </div>
+              </div>
+            </blockquote>
+
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    $(document).ready(function () {
+      $("#selfBonus").hide(0).show(1000);
+    })
+  </script>
+</template>
+
+
+
+<!-- template for UG outcomes -->
+<!-- TODO: Add template logic to 4 quadrant display -->
+<!-- Current code is just a UI scaffold. We should loop using handlebars and template variables to create all 4 quadrants -->
+<template name="UGOutcome">
+  <div class="row UGOutcome-row-div">
+
+    {{#each data.players}}
+    <div class="col-xs-6 UGOutcome-row">
+      <div class="row">
+        <div class="col-sm-1"></div>
+        <div class="col-xs-7">
+          <table class="table text-center">
+            <tr id="iconRow">
+              <td></td>
+              {{#each data.iconarray}}
+              <td><img class="rowAvatar" src="{{this}}"></td>
+              {{/each}}
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr id="totalRow">
+              <td><span class='rowHeader' style="color:black;">Received:</span></td>
+              {{#each received}}
+              <td class="tableRow">{{this}}</td>
+              {{/each}}
+              <td></td>
+              <td></td>
+              <td></td>
+            </tr>
+            <tr class='BonusRow'>
+              <td id="bonusRow" style="font-size: 2rem;">Bonus:</td>
+              {{#each bonus.bonus4}}
+              <td id="bonusRow">{{this}}</td>
+              {{/each}}
+              <td id="bonusRow">x4</td>
+              <td id="bonusRow">=</td>
+              <td id="bonusRow">{{resultmulti4}}</td>
+            </tr>
+            <tr class='BonusRow'>
+              <td id="bonusRow"></td>
+              {{#each bonus.bonus3}}
+              <td id="bonusRow">{{this}}</td>
+              {{/each}}
+              <td id="bonusRow">x3</td>
+              <td id="bonusRow">=</td>
+              <td id="bonusRow">{{resultmulti3}}</td>
+            </tr>
+            <tr class='BonusRow'>
+              <td id="bonusRow"></td>
+              {{#each bonus.bonus2}}
+              <td id="bonusRow">{{this}}</td>
+              {{/each}}
+              <td id="bonusRow">x2</td>
+              <td id="bonusRow">=</td>
+              <td id="bonusRow">{{resultmulti2}}</td>
+            </tr>
+            <tr class='BonusRow'>
+              <td id="bonusRow"></td>
+              {{#each bonus.bonus1}}
+              <td id="bonusRow">{{this}}</td>
+              {{/each}}
+              <td id="bonusRow">x1</td>
+              <td id="bonusRow">=</td>
+              <td id="bonusRow">{{resultmulti1}}</td>
+            </tr>
+          </table>
+
+        </div>
+        <div class="col-xs-3 text-center">
+          <div class="row">
+            <img class="outcomeAvatar" src="{{icon}}">
+            {{#if isSelf}}
+            <p class="UGOutcome-label">(You)</p>
+            {{else}}
+            <p style="margin-top:3rem"></p>
+            {{/if}}
+            <p class='bonusOutcome'>+{{total}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    {{/each}}
+
+  </div>
+
+</template>
+
+<template name="roundOutcome">
+  <div class="col-xs-12" style="{{game.messageSubPromptDisplay}}">
+    <p id="messagePrompt"><span>{{game.messageSubPrompt}}</span></p>
+  </div>
+  <div class="col-xs-10 col-xs-offset-1">
+    <ul class="roundEarnings" align="center">
+      {{#each totals}}
+      <li class="roundEarningsText"> <img class="avatar" src="{{icon}}"><span
+          id="{{#if isSelf}}RoundplayerLabel{{/if}}">earned a total of: {{pggtotal}} bags of rice and {{ugtotal}}
+          bushels
+          of wheat.</span></li>
+      {{/each}}
+    </ul>
+  </div>
+</template>
+
+<!-- TODO: Create another template to jitter display of UG outcome and bonus calculation -->
+<!--New template that renders bonus multiplication table in addition to the UG Outcome -->
+<template name="UGFullOutcome">
+</template>
+<!-- template for player ratings -->
+<template name="playerRatings">
+  <div class="col-xs-8 col-xs-offset-2">
+    <div class="well well-sm well-text" align="center" id="{{survey.question.idx}}">
+      <b>{{#if survey.stillAnswering}} {{survey.question.question}} {{else}} You have finished answering all the
+        questions {{/if}}</b>
+    </div>
+  </div>
+  <div class="col-xs-12">
+    <p id="messagePrompt"> {{#if survey.stillAnswering}}
+      <b>{{survey.question.sliders}}</b><br><span>{{survey.question.anchors}}</span>
+      {{else}} Please wait for the other participants to finish {{/if}}</p>
+  </div>
+  {{#if survey.stillAnswering}}
+  <div class="col-xs-6 col-xs-offset-3">
+    <form class="form-horizontal ratings">
+      {{#each survey.players}}
+      <div class="form-group">
+        <label for="{{user}}"><img class="avatar" src="{{icon}}"></label>
+        <input id="{{user}}" type="range" value="{{limit}}" min="0" max="100" class="playerRange">
+      </div>
+      {{/each}}
+      <button type="submit" class="btn btn-primary btn-lg submit" aria-label="Left Align"
+        style="margin-left:auto; margin-right:auto; display:block" id="submitRatings">Submit</button>
+    </form>
+  </div>
+  {{/if}}
+</template>
+
+<!-- template for final rankings -->
+<template name="finalOutcomes">
+  <div class="col-xs-12" style="{{game.messageSubPromptDisplay}}">
+    <p id="messagePrompt"><span>{{game.messageSubPrompt}}</span></p>
+  </div>
+  <div class="col-xs-10 col-xs-offset-1">
+    <ul class="finalEarnings" align="center">
+      {{#each totals}}
+      <li class="finalEarningsText"> <img class="avatar" src="{{icon}}"><span
+          id="{{#if isplayer}}playerLabel{{/if}}">earned a total of: {{pggtotal}} bags of rice and {{ugtotal}} bushels
+          of wheat.</span></li>
+      {{/each}}
+    </ul>
+  </div>
+</template>

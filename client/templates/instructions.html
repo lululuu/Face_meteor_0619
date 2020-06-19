@@ -1,0 +1,450 @@
+<!-- TODO: Edit instructions for new version -->
+<template name="instructions">
+  <div class="container-fluid" id="main">
+    {{> tutorial options}}
+  </div>
+</template>
+
+<template name="accept">
+  <h3 align="center"> Thank you for accepting this HIT</h3>
+  <blockquote class="instr">
+    For the best experience please scroll/adjust the window until you can see both the top and bottom banners of the
+    screen.<br><br>
+    Please read the following set of instructions <i>carefully</i> to learn how to play the game.<br><br>
+    You may move forward and backwards through any page of these instructions at any time.
+  </blockquote>
+  <br>
+  <p align="center" style="font-size:14px"> Click next to begin the instructions </p>
+</template>
+
+<template name="overview_PGG">
+  <h3 align="center">Game Overview</h3>
+  <blockquote class="instr">
+    In this game, you will play as a farmer and work closely with <b>{{otherPlayers}} other farmers in real-time</b>
+    over the course of {{numRounds}} seasons. As a farmer you have the ability to trade <i>rice</i> and <i>wheat</i>
+    with other farmers. Your job is to make decisions on how much rice and how much wheat to trade with other farmers
+    during each season. At the end of the game we will randomly select one of the seasons and pay you a bonus based on
+    total amount of rice and wheat that you earned at the rate of: <b>1 unit of rice = 1 cents. 1 unit of wheat = 10
+      cents</b>
+  </blockquote>
+  <blockquote class="instr">
+    At the beginning of every season your harvest yields 100 bags of rice. The local government has decided that each
+    season it will reward farmers with extra rice by matching the total amount that all {{groupSize}} farmers share in
+    their public co-op. For example, if each farmer chooses to share 50 bags of rice, resulting in a total of 200 bags
+    of rice in the co-op, the government will <b>double</b> this to a total of 400 bags of rice. This new total will be
+    redistributed to all farmers. To facilitate this redistribution, the goverment will appoint one of you to be the
+    <b>head farmer</b> for the entire game. The head farmer's job is to decide how to divide all the <i>rice</i> stored
+    in the public co-op in any way he/she wants.
+  </blockquote>
+</template>
+
+<template name="UG">
+  <h3 align="center">Game Overview</h3>
+  <blockquote class="instr">
+    To help feed your family, the goverment will also give each farmer 30 bushels of wheat. Because you cannot harvest
+    more wheat, the goverment has permitted you to trade a maximum of 10 bushels of wheat with any other farmer. In
+    order to trade, farmers will privately make offers to each other. Afterwards, farmers will be given the option to
+    "accept" or "reject" these proposals as they see fit. If a farmer reject a proposal, <i>neither farmer</i> will get
+    any wheat that season.
+  </blockquote>
+  <blockquote class="instr">
+    For example, if you make an offer of 2 bushels of wheat to another farmer (keeping 8 bushels of wheat for yourself)
+    and the other farmer rejects this offer, both of you will get 0 bushels of wheat.
+  </blockquote>
+</template>
+
+
+<template name="rounds">
+  <h3 align="center">How Each Season Works</h3>
+  <blockquote class="instr">
+    Each season contains two phases. In phase one, you will decide <b>how many of your own bags of rice to contribute to
+      the public co-op</b>, from 0 to 100. After all farmers make their decision, the goverment will match the total in
+    the co-op and the head farmer will decide how to re-distribute these bags to each farmer. After the head farmer
+    makes these decisions, you will see how many bags of rice each farmer received at the end of this phase.
+  </blockquote>
+  <blockquote class="instr">
+    In phase two, you will be paired with each farmer (including the head farmer) and privately make offers for wheat.
+    To make an offer you will decide <b>how much wheat you would like to divide between yourself and another farmer</b>,
+    from 0 to 10 bushels. After all farmers have made their offers, you will decide whether to "accept" or "reject" each
+    individual offer you received, while other farmers do the same. At the end of this phase, you will see how many
+    bushels of wheat each farmer earned.
+  </blockquote>
+</template>
+
+<template name="exampleRound">
+  <h3 align="center">Example Round</h3>
+  <p align="center" style='font-size: 16px'>To illustrate the game let's look at an example round:</p>
+
+  <ol class="exampleRound">
+    <li class="exampleRound">You will receive 100 units of rice and choose how many to contribute to the group account;
+      let's say you choose to contribute 50 units</li>
+    <li class="exampleRound">You will be able to see the contributions made by all the other players; let's say you see
+      contributions of: 100, 0, and 50 units. In this example, the total units at the group barn will be 200.</li>
+    <li class="exampleRound">The Allocator will decide how to re-distribute the units at the group barn after the
+      multiplier is applied; If you are the Allocator, you will make the decision. Other farmers will wait until you
+      make the decision.</li>
+    <li class="exampleRound">All farmers will see how many units that they have after the Allocator makes the decision.
+      For example, if you receive 75 units from the Allocator's decision; your total earned for this part would be
+      <b>125 units of rice</b> (50 you didn't contribute + 75 you earned)</li>
+    <li class="exampleRound">After the Allocater's decision, you will paired with Farmer B, C, and D simultaneously to
+      decide how to divide 10 units of wheat for yourself and to each of the three farmers. Let's say you will decide to
+      keep 6 units for yourself and 4 units to Farmer B. You also decide to keep 3 units for yourself and 7 units to
+      Farmer C. Lastly, you decide to keep 7 units for yourself and 3 units to Farmer D.</li>
+    <li class="exampleRound">After you make the offers to all three farmers, these three farmers will decide whether
+      he/she is going to accept or reject your offer. At the same time, you will also receive the three offers from
+      these three farmers. You will also decide whether you are going to accept or reject their offers. For example,
+      Farmer B offers you 5 units, Farmer C offers you 2 units, and Farmer D offers you 6 units. You then decide to
+      accept Farmer B and D's offers, but reject C's offer.</li>
+    <li class="exampleRound">At the same time, Farmer B and C decide to accept the offers that you propose, but Farmer D
+      reject your offer. Thus, at the end of the second stage, your total units of wheat = 5 (accept from B) + 0 (reject
+      to C) + 6 (accept from D) + 6 (you propose 5 for yourself and B accept) + 3 (you propose 3 for yourself and C
+      accept) + 0 (you propose 7 for yourself and D reject) = 20 units of wheat.</li>
+  </ol>
+</template>
+
+<template name="recap">
+  <h3 align="center">Recap</h3>
+  <blockquote class="instr">
+    To review, you will play a game with {{otherPlayers}} other players consisting of {{numRounds}} rounds. Each round
+    will comprise<br><br>
+    <ol>
+      <li>Each player will receive 100 units of rice and decide how many of their units to contribute to the group barn
+      </li>
+      <li>Each player will see the contributions made by other players</li>
+      <li>The Allocator will decide how to distribute multiplied units at the group barn to each player</li>
+      <li>Each player will see the decision made by the Allocator</li>
+      <li>Each player will be paired with each of other players simultaneously. You will be the Decider and propose how
+        to divide a total of 10 units of wheat to yourself and to each player.</li>
+      <li>You will then become the Receiver and decide whether you will accept or reject the offers provided by other
+        players</li>
+      <li>Each player will see the outcome after every player makes the decision.</li>
+    </ol>
+  </blockquote>
+</template>
+
+<template name="exampleBonus">
+  <h3 align="center">How is bonus calculated?</h3>
+  <blockquote class="instr">
+    <div class="row">
+      <div class="col-xs-10 ">
+        <table class="table text-center">
+          <tr id="iconRow">
+            <td></td>
+            <td><img class="rowAvatar" src="/avatars/cat_food.png"></td>
+            <td><img class="rowAvatar" src="/avatars/lion_food.png"></td>
+            <td><img class="rowAvatar" src="/avatars/elephant_food.png"></td>
+            <td><img class="rowAvatar" src="/avatars/cow_food.png"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr id="totalRow">
+            <td><span class='rowHeader' style="color:black;">Received:</span></td>
+            <td class="tableRow">10</td>
+            <td class="tableRow">0</td>
+            <td class="tableRow">0</td>
+            <td class="tableRow">0</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow" style="font-size: 2rem;">Bonus:</td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">x4</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">0</td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">x3</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">0</td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">x2</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">0</td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">10</td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">x1</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">10</td>
+          </tr>
+        </table>
+
+      </div>
+      <div class="col-xs-2 text-center">
+        <div class="row">
+          <p style="margin-top:3rem"></p>
+          <p class='bonusOutcome'>+10</p>
+        </div>
+      </div>
+    </div>
+  </blockquote>
+  <blockquote class="instr">
+    <div class="row">
+      <div class="col-xs-10 ">
+        <table class="table text-center">
+          <tr id="iconRow">
+            <td></td>
+            <td><img class="rowAvatar" src="/avatars/cat_food.png"></td>
+            <td><img class="rowAvatar" src="/avatars/lion_food.png"></td>
+            <td><img class="rowAvatar" src="/avatars/elephant_food.png"></td>
+            <td><img class="rowAvatar" src="/avatars/cow_food.png"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr id="totalRow">
+            <td><span class='rowHeader' style="color:black;">Received:</span></td>
+            <td class="tableRow">0</td>
+            <td class="tableRow">5</td>
+            <td class="tableRow">5</td>
+            <td class="tableRow">0</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow" style="font-size: 2rem;">Bonus:</td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">x4</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">0</td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">x3</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">0</td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">5</td>
+            <td id="bonusRow">5</td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">x2</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">20</td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">x1</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">0</td>
+          </tr>
+        </table>
+
+      </div>
+      <div class="col-xs-2 text-center">
+        <div class="row">
+          <p style="margin-top:3rem"></p>
+          <p class='bonusOutcome'>+20</p>
+        </div>
+      </div>
+    </div>
+  </blockquote>
+  <blockquote class="instr">
+    <div class="row">
+      <div class="col-xs-10 ">
+        <table class="table text-center">
+          <tr id="iconRow">
+            <td></td>
+            <td><img class="rowAvatar" src="/avatars/cat_food.png"></td>
+            <td><img class="rowAvatar" src="/avatars/lion_food.png"></td>
+            <td><img class="rowAvatar" src="/avatars/elephant_food.png"></td>
+            <td><img class="rowAvatar" src="/avatars/cow_food.png"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr id="totalRow">
+            <td><span class='rowHeader' style="color:black;">Received:</span></td>
+            <td class="tableRow">3</td>
+            <td class="tableRow">4</td>
+            <td class="tableRow">3</td>
+            <td class="tableRow">0</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow" style="font-size: 2rem;">Bonus:</td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">x4</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">0</td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">3</td>
+            <td id="bonusRow">3</td>
+            <td id="bonusRow">3</td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">x3</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">27</td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">x2</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">0</td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">1</td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">x1</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">1</td>
+          </tr>
+        </table>
+
+      </div>
+      <div class="col-xs-2 text-center">
+        <div class="row">
+          <p style="margin-top:3rem"></p>
+          <p class='bonusOutcome'>+28</p>
+        </div>
+      </div>
+    </div>
+  </blockquote>
+  <blockquote class="instr">
+    <div class="row">
+      <div class="col-xs-10 ">
+        <table class="table text-center">
+          <tr id="iconRow">
+            <td></td>
+            <td><img class="rowAvatar" src="/avatars/cat_food.png"></td>
+            <td><img class="rowAvatar" src="/avatars/lion_food.png"></td>
+            <td><img class="rowAvatar" src="/avatars/elephant_food.png"></td>
+            <td><img class="rowAvatar" src="/avatars/cow_food.png"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr id="totalRow">
+            <td><span class='rowHeader' style="color:black;">Received:</span></td>
+            <td class="tableRow">2</td>
+            <td class="tableRow">3</td>
+            <td class="tableRow">2</td>
+            <td class="tableRow">3</td>
+            <td></td>
+            <td></td>
+            <td></td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow" style="font-size: 2rem;">Bonus:</td>
+            <td id="bonusRow">2</td>
+            <td id="bonusRow">2</td>
+            <td id="bonusRow">2</td>
+            <td id="bonusRow">2</td>
+            <td id="bonusRow">x4</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">32</td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">x3</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">0</td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">1</td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">1</td>
+            <td id="bonusRow">x2</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">4</td>
+          </tr>
+          <tr class='BonusRow'>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow"></td>
+            <td id="bonusRow">x1</td>
+            <td id="bonusRow">=</td>
+            <td id="bonusRow">0</td>
+          </tr>
+        </table>
+
+      </div>
+      <div class="col-xs-2 text-center">
+        <div class="row">
+          <p style="margin-top:3rem"></p>
+          <p class='bonusOutcome'>+36</p>
+        </div>
+      </div>
+    </div>
+  </blockquote>
+
+</template>
+
+<template name="timing">
+  <h3 align="center">Connection and Timing Considerations</h3>
+  <blockquote class="instr">
+    Because you are interacting in <b>real time</b> with {{otherPlayers}} other players, it is <b>extremely
+      important</b> that you make your decisions within a timely manner.<br><br>
+    If you idle for too long during the game you will <b>forfeit</b> any bonuses you could have earned during this
+    HIT.<br><br>
+    If your game partners have connection issues you will still be paid for completing the HIT including any bonuses
+    earned.
+  </blockquote>
+</template>
+
+<template name="preQuiz">
+  <h3 align="center">Please be sure you have understood these instructions before proceeding</h3>
+  <blockquote class="instr">
+    On the next page we will ask you some questions to ensure your understanding. If you fail to answer these questions
+    correctly you will not be eligible to play and complete this HIT.<br><br>
+    You may move backwards and forwards through these instructions screens as much as you like before and during the
+    quiz.
+  </blockquote>
+</template>
